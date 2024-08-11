@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Typing Speed Test</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #test-container {
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      width: 500px;
+    }
+    #test-text {
+      font-size: 18px;
+    }
+    #input-box {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div id="test-container">
+    <h1>Typing Speed Test</h1>
+    <p id="test-text">The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.</p>
+    <input type="text" id="input-box" disabled>
+    <button id="start-button">Start</button>
+    <div>
+      <p>WPM: <span id="wpm">0</span></p>
+      <p>Accuracy: <span id="accuracy">0%</span></p>
+    </div>
+  </div>
+
+  <script>
+    const testText = document.getElementById('test-text').textContent;
+    const inputBox = document.getElementById('input-box');
+    const startButton = document.getElementById('start-button');
+    const wpmDisplay = document.getElementById('wpm');
+    const accuracyDisplay = document.getElementById('accuracy');
+
+    let startTime, endTime;
+    let typedText = '';
+
+    startButton.addEventListener('click', () => {
+      startTime = new Date();
+      inputBox.disabled = false;
+      inputBox.focus();
+      startButton.disabled = true;
+    });
+
+    inputBox.addEventListener('input', () => {
+      typedText = inputBox.value;
+      if (typedText === testText) {
+        endTime = new Date();
+        calculateResults();
+        inputBox.disabled = true;
+        startButton.disabled = false;
+      }
+    });
+
+    function calculateResults() {
+      const timeTaken = (endTime - startTime) / 1000; // in seconds
+      const words = testText.split(' ').length;
+      const wpm = Math.round((words / timeTaken) * 60);
+      const accuracy = Math.round((typedText.length - getErrors(testText, typedText)) / testText.length * 100);
+      wpmDisplay.textContent = wpm;
+      accuracyDisplay.textContent = accuracy + '%';
+    }
+
+    function getErrors(correctText, typedText) {
+      let errors = 0;
+      for (let i = 0; i < Math.min(correctText.length, typedText.length); i++) {
+        if (correctText[i] !== typedText[i]) {
+          errors++;
+        }
+      }
+      return errors;
+    }
+  </script>
+</body>
+</html>
