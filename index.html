@@ -15,7 +15,7 @@
     }
     #test-text {
       font-size: 18px;
-      white-space: pre-wrap; /* Preserve line breaks */
+      white-space: pre-wrap;
     }
     #input-box {
       width: 100%;
@@ -39,7 +39,7 @@
       color: white;
     }
     #end-button {
-      background-color: #f44336; /* Red */
+      background-color: #f44336;
       color: white;
     }
     #difficulty-select {
@@ -48,6 +48,12 @@
     #timer {
       font-size: 24px;
       margin-bottom: 10px;
+    }
+    .correct {
+      color: green;
+    }
+    .incorrect {
+      color: red;
     }
   </style>
 </head>
@@ -89,12 +95,11 @@
 
     let startTime, endTime;
     let typedText = '';
-    let testText = ''; // Store the actual test text
+    let testText = ''; 
     let timerInterval;
     let bestWpm = 0;
     let bestAccuracy = 0;
 
-    // Load best scores from local storage
     if (localStorage.getItem('bestWpm')) {
       bestWpm = parseInt(localStorage.getItem('bestWpm'));
       bestWpmDisplay.textContent = bestWpm;
@@ -105,23 +110,45 @@
     }
 
     function setTestText(difficulty) {
+      const easySamples = [
+        'The quick brown fox jumps over the lazy dog.',
+        'A fast black cat dashes under the quiet moon.',
+        'Every good boy does fine.',
+        'Jump high, run fast, and play fair.'
+      ];
+
+      const mediumSamples = [
+        'Typing speed is a skill that can be developed with consistent practice.',
+        'Programming languages like JavaScript, Python, and C++ are popular among developers.',
+        'The Eiffel Tower in Paris is one of the most iconic landmarks in the world.',
+        'Learning new skills can be both challenging and rewarding.'
+      ];
+
+      const hardSamples = [
+        'As technology advances, artificial intelligence continues to evolve at an unprecedented rate, creating both opportunities and ethical dilemmas that society must address.',
+        'Quantum computing leverages the principles of quantum mechanics to process information in fundamentally different ways compared to classical computers, opening up new possibilities in cryptography and complex problem-solving.',
+        'The theory of relativity, developed by Albert Einstein, revolutionized the understanding of space, time, and gravity, challenging long-held beliefs and laying the groundwork for modern physics.',
+        'In the context of environmental sustainability, adopting renewable energy sources such as solar, wind, and hydropower is crucial to mitigating the impact of climate change and ensuring a cleaner, more sustainable future for generations to come.'
+      ];
+
       switch (difficulty) {
         case 'easy':
-          testText = 'The quick brown fox jumps over the lazy dog.';
+          testText = easySamples[Math.floor(Math.random() * easySamples.length)];
           break;
         case 'medium':
-          testText = 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.';
+          testText = mediumSamples[Math.floor(Math.random() * mediumSamples.length)];
           break;
         case 'hard':
-          testText = 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.';
+          testText = hardSamples[Math.floor(Math.random() * hardSamples.length)];
           break;
       }
-      testTextElement.textContent = testText;
+      testTextElement.innerHTML = testText.split('').map(letter => `<span>${letter}</span>`).join('');
     }
 
     startButton.addEventListener('click', () => {
       startTime = new Date();
       inputBox.disabled = false;
+      inputBox.value = ''; // Clear the input box
       inputBox.focus();
       startButton.disabled = true;
       endButton.disabled = false;
@@ -140,6 +167,19 @@
 
     inputBox.addEventListener('input', () => {
       typedText = inputBox.value;
+      const spans = testTextElement.querySelectorAll('span');
+      for (let i = 0; i < spans.length; i++) {
+        if (typedText[i] === undefined) {
+          spans[i].classList.remove('correct', 'incorrect');
+        } else if (typedText[i] === spans[i].textContent) {
+          spans[i].classList.add('correct');
+          spans[i].classList.remove('incorrect');
+        } else {
+          spans[i].classList.add('incorrect');
+          spans[i].classList.remove('correct');
+        }
+      }
+
       if (typedText === testText) {
         endTime = new Date();
         clearInterval(timerInterval);
@@ -156,14 +196,13 @@
     });
 
     function calculateResults() {
-      const timeTaken = (endTime - startTime) / 1000; // in seconds
-      const words = testText.trim().split(/\s+/).length; // Trim and split by spaces
+      const timeTaken = (endTime - startTime) / 1000; 
+      const words = testText.trim().split(/\s+/).length; 
       const wpm = Math.round((words / timeTaken) * 60);
       const accuracy = Math.round((typedText.length - getErrors(testText, typedText)) / testText.length * 100);
       wpmDisplay.textContent = wpm;
       accuracyDisplay.textContent = accuracy + '%';
 
-      // Update best scores
       if (wpm > bestWpm) {
         bestWpm = wpm;
         bestWpmDisplay.textContent = bestWpm;
@@ -193,7 +232,6 @@
       timerDisplay.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    // Initial setup: Set easy difficulty by default
     setTestText('easy');
   </script>
 </body>
