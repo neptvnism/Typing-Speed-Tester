@@ -15,6 +15,7 @@
     }
     #test-text {
       font-size: 18px;
+      white-space: pre-wrap; /* Preserve line breaks */
     }
     #input-box {
       width: 100%;
@@ -23,35 +24,92 @@
       border: 1px solid #ccc;
       font-size: 16px;
     }
+    #results {
+      margin-top: 20px;
+    }
+    #start-button, #end-button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #start-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+    #end-button {
+      background-color: #f44336; /* Red */
+      color: white;
+    }
+    #difficulty-select {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <div id="test-container">
     <h1>Typing Speed Test</h1>
-    <p id="test-text">The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.</p>
+    <p id="test-text">The quick brown fox jumps over the lazy dog.</p>
     <input type="text" id="input-box" disabled>
     <button id="start-button">Start</button>
-    <div>
+    <button id="end-button" disabled>End</button>
+    <div id="results">
       <p>WPM: <span id="wpm">0</span></p>
       <p>Accuracy: <span id="accuracy">0%</span></p>
+    </div>
+    <div id="difficulty-select">
+      <label for="difficulty">Difficulty:</label>
+      <select id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
     </div>
   </div>
 
   <script>
-    const testText = document.getElementById('test-text').textContent;
+    const testTextElement = document.getElementById('test-text');
     const inputBox = document.getElementById('input-box');
     const startButton = document.getElementById('start-button');
+    const endButton = document.getElementById('end-button');
     const wpmDisplay = document.getElementById('wpm');
     const accuracyDisplay = document.getElementById('accuracy');
+    const difficultySelect = document.getElementById('difficulty');
 
     let startTime, endTime;
     let typedText = '';
+    let testText = ''; // Store the actual test text
+
+    function setTestText(difficulty) {
+      switch (difficulty) {
+        case 'easy':
+          testText = 'The quick brown fox jumps over the lazy dog.';
+          break;
+        case 'medium':
+          testText = 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.';
+          break;
+        case 'hard':
+          testText = 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.';
+          break;
+      }
+      testTextElement.textContent = testText;
+    }
 
     startButton.addEventListener('click', () => {
       startTime = new Date();
       inputBox.disabled = false;
       inputBox.focus();
       startButton.disabled = true;
+      endButton.disabled = false;
+    });
+
+    endButton.addEventListener('click', () => {
+      endTime = new Date();
+      calculateResults();
+      inputBox.disabled = true;
+      startButton.disabled = false;
+      endButton.disabled = true;
     });
 
     inputBox.addEventListener('input', () => {
@@ -61,12 +119,17 @@
         calculateResults();
         inputBox.disabled = true;
         startButton.disabled = false;
+        endButton.disabled = true;
       }
+    });
+
+    difficultySelect.addEventListener('change', () => {
+      setTestText(difficultySelect.value);
     });
 
     function calculateResults() {
       const timeTaken = (endTime - startTime) / 1000; // in seconds
-      const words = testText.split(' ').length;
+      const words = testText.trim().split(/\s+/).length; // Trim and split by spaces
       const wpm = Math.round((words / timeTaken) * 60);
       const accuracy = Math.round((typedText.length - getErrors(testText, typedText)) / testText.length * 100);
       wpmDisplay.textContent = wpm;
@@ -82,6 +145,9 @@
       }
       return errors;
     }
+
+    // Initial setup: Set easy difficulty by default
+    setTestText('easy');
   </script>
 </body>
 </html>
