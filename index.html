@@ -1,236 +1,348 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Typing Speed Test</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Test</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Arial Rounded MT', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
       text-align: center;
-    }
-    #test-container {
-      margin: 20px auto;
+      background-color: #fff;
       padding: 20px;
-      border: 1px solid #ccc;
-      width: 500px;
-    }
-    #test-text {
-      font-size: 18px;
-      white-space: pre-wrap;
-    }
-    #input-box {
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      font-size: 16px;
     }
-    #results {
-      margin-top: 20px;
-    }
-    #start-button, #end-button {
-      padding: 10px 20px;
-      margin: 5px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #start-button {
-      background-color: #4CAF50;
-      color: white;
-    }
-    #end-button {
-      background-color: #f44336;
-      color: white;
-    }
-    #difficulty-select {
-      margin-top: 10px;
-    }
-    #timer {
+
+    h1 {
+      margin-bottom: 20px;
       font-size: 24px;
-      margin-bottom: 10px;
     }
-    .correct {
+
+    .test-text {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+      font-size: 18px;
+    }
+
+    .test-text span.correct {
       color: green;
     }
-    .incorrect {
+
+    .test-text span.incorrect {
       color: red;
+    }
+
+    .input-box {
+      width: 100%;
+      padding: 10px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .settings-container {
+      text-align: left;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .settings-container select, 
+    .settings-container input {
+      padding: 5px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .settings-container button {
+      padding: 10px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .settings-container button:hover {
+      background-color: #0056b3;
+    }
+
+    #timerDisplay {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .control-buttons {
+      margin-bottom: 10px;
+    }
+
+    .control-buttons button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+
+    .control-buttons button:hover {
+      background-color: #0056b3;
+    }
+
+    #settingsButton {
+      background-color: #28a745;
+    }
+
+    #settingsButton:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
-  <div id="test-container">
-    <h1>Typing Speed Test</h1>
-    <p id="timer">Time: 00:00</p>
-    <p id="test-text">The quick brown fox jumps over the lazy dog.</p>
-    <input type="text" id="input-box" disabled>
-    <button id="start-button">Start</button>
-    <button id="end-button" disabled>End</button>
-    <div id="results">
-      <p>WPM: <span id="wpm">0</span></p>
-      <p>Accuracy: <span id="accuracy">0%</span></p>
-      <p>Best WPM: <span id="best-wpm">0</span></p>
-      <p>Best Accuracy: <span id="best-accuracy">0%</span></p>
+  <div class="container">
+    <h1>Typing Test</h1>
+
+    <div class="control-buttons">
+      <button id="startButton">Start</button>
+      <button id="endButton">End</button>
+      <button id="settingsButton">Settings</button>
     </div>
-    <div id="difficulty-select">
-      <label for="difficulty">Difficulty:</label>
-      <select id="difficulty">
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
+
+    <div class="settings-container">
+      <div>
+        <label for="difficultySelect">Select Difficulty:</label>
+        <select id="difficultySelect">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+      <div>
+        <label for="fontSelect">Select Font:</label>
+        <select id="fontSelect">
+          <option value="'Arial Rounded MT', Arial, sans-serif">Arial Rounded MT</option>
+          <option value="Courier New, Courier, monospace">Courier New</option>
+          <option value="'Times New Roman', Times, serif">Times New Roman</option>
+        </select>
+      </div>
+      <div>
+        <label for="textSizeSelect">Select Text Size:</label>
+        <select id="textSizeSelect">
+          <option value="16px">16px</option>
+          <option value="18px">18px</option>
+          <option value="20px">20px</option>
+          <option value="24px">24px</option>
+        </select>
+      </div>
+      <div>
+        <label for="colorFeedbackToggle">Color Feedback:</label>
+        <input type="checkbox" id="colorFeedbackToggle" checked>
+      </div>
+      <div>
+        <label for="timerToggle">Enable Timer:</label>
+        <input type="checkbox" id="timerToggle">
+      </div>
+      <button id="resetButton">Reset Progress</button>
+    </div>
+
+    <div id="testText" class="test-text"></div>
+
+    <input id="inputBox" class="input-box" type="text" placeholder="Start typing here...">
+    <div id="timerDisplay"></div>
+    <div class="stats">
+      <div>WPM: <span id="wpmDisplay">0</span></div>
+      <div>Accuracy: <span id="accuracyDisplay">0%</span></div>
+    </div>
+    <div class="stats">
+      <div>Best WPM: <span id="bestWpmDisplay">0</span></div>
+      <div>Best Accuracy: <span id="bestAccuracyDisplay">0%</span></div>
     </div>
   </div>
 
   <script>
-    const testTextElement = document.getElementById('test-text');
-    const inputBox = document.getElementById('input-box');
-    const startButton = document.getElementById('start-button');
-    const endButton = document.getElementById('end-button');
-    const wpmDisplay = document.getElementById('wpm');
-    const accuracyDisplay = document.getElementById('accuracy');
-    const difficultySelect = document.getElementById('difficulty');
-    const timerDisplay = document.getElementById('timer');
-    const bestWpmDisplay = document.getElementById('best-wpm');
-    const bestAccuracyDisplay = document.getElementById('best-accuracy');
+    const testTextElement = document.getElementById('testText');
+    const inputBox = document.getElementById('inputBox');
+    const wpmDisplay = document.getElementById('wpmDisplay');
+    const accuracyDisplay = document.getElementById('accuracyDisplay');
+    const bestWpmDisplay = document.getElementById('bestWpmDisplay');
+    const bestAccuracyDisplay = document.getElementById('bestAccuracyDisplay');
+    const difficultySelect = document.getElementById('difficultySelect');
+    const fontSelect = document.getElementById('fontSelect');
+    const textSizeSelect = document.getElementById('textSizeSelect');
+    const colorFeedbackToggle = document.getElementById('colorFeedbackToggle');
+    const timerToggle = document.getElementById('timerToggle');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const resetButton = document.getElementById('resetButton');
+    const startButton = document.getElementById('startButton');
+    const endButton = document.getElementById('endButton');
+    const settingsButton = document.getElementById('settingsButton');
+    const settingsContainer = document.querySelector('.settings-container');
 
-    let startTime, endTime;
+    let testText = '';
     let typedText = '';
-    let testText = ''; 
+    let startTime, endTime;
+    let bestWpm = localStorage.getItem('bestWpm') || 0;
+    let bestAccuracy = localStorage.getItem('bestAccuracy') || 0;
+    let colorFeedbackEnabled = true;
+    let timerEnabled = false;
     let timerInterval;
-    let bestWpm = 0;
-    let bestAccuracy = 0;
 
-    if (localStorage.getItem('bestWpm')) {
-      bestWpm = parseInt(localStorage.getItem('bestWpm'));
-      bestWpmDisplay.textContent = bestWpm;
-    }
-    if (localStorage.getItem('bestAccuracy')) {
-      bestAccuracy = parseInt(localStorage.getItem('bestAccuracy'));
-      bestAccuracyDisplay.textContent = bestAccuracy;
-    }
+    bestWpmDisplay.textContent = bestWpm;
+    bestAccuracyDisplay.textContent = bestAccuracy + '%';
 
     function setTestText(difficulty) {
-      const easySamples = [
-        'The quick brown fox jumps over the lazy dog.',
-        'A fast black cat dashes under the quiet moon.',
-        'Every good boy does fine.',
-        'Jump high, run fast, and play fair.'
-      ];
-
-      const mediumSamples = [
-        'Typing speed is a skill that can be developed with consistent practice.',
-        'Programming languages like JavaScript, Python, and C++ are popular among developers.',
-        'The Eiffel Tower in Paris is one of the most iconic landmarks in the world.',
-        'Learning new skills can be both challenging and rewarding.'
-      ];
-
-      const hardSamples = [
-        'As technology advances, artificial intelligence continues to evolve at an unprecedented rate, creating both opportunities and ethical dilemmas that society must address.',
-        'Quantum computing leverages the principles of quantum mechanics to process information in fundamentally different ways compared to classical computers, opening up new possibilities in cryptography and complex problem-solving.',
-        'The theory of relativity, developed by Albert Einstein, revolutionized the understanding of space, time, and gravity, challenging long-held beliefs and laying the groundwork for modern physics.',
-        'In the context of environmental sustainability, adopting renewable energy sources such as solar, wind, and hydropower is crucial to mitigating the impact of climate change and ensuring a cleaner, more sustainable future for generations to come.'
-      ];
-
-      switch (difficulty) {
-        case 'easy':
-          testText = easySamples[Math.floor(Math.random() * easySamples.length)];
-          break;
-        case 'medium':
-          testText = mediumSamples[Math.floor(Math.random() * mediumSamples.length)];
-          break;
-        case 'hard':
-          testText = hardSamples[Math.floor(Math.random() * hardSamples.length)];
-          break;
+      const easyText = "The quick brown fox jumps over the lazy dog.";
+      const mediumText = "Pack my box with five dozen liquor jugs.";
+      const hardText = "How razorback-jumping frogs can level six piqued gymnasts!";
+      if (difficulty === 'easy') {
+        testText = easyText;
+      } else if (difficulty === 'medium') {
+        testText = mediumText;
+      } else if (difficulty === 'hard') {
+        testText = hardText;
       }
       testTextElement.innerHTML = testText.split('').map(letter => `<span>${letter}</span>`).join('');
+      inputBox.value = '';
+      typedText = '';
+      wpmDisplay.textContent = '0';
+      accuracyDisplay.textContent = '0%';
+      if (timerEnabled) {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = 'Time: 0s';
+      }
     }
 
-    startButton.addEventListener('click', () => {
-      startTime = new Date();
-      inputBox.disabled = false;
-      inputBox.value = ''; // Clear the input box
-      inputBox.focus();
-      startButton.disabled = true;
-      endButton.disabled = false;
-      timerInterval = setInterval(updateTimer, 1000);
-    });
-
-    endButton.addEventListener('click', () => {
-      endTime = new Date();
-      clearInterval(timerInterval);
-      calculateResults();
-      inputBox.disabled = true;
-      startButton.disabled = false;
-      endButton.disabled = true;
-      timerDisplay.textContent = 'Time: 00:00';
-    });
-
-    inputBox.addEventListener('input', () => {
-      typedText = inputBox.value;
-      const spans = testTextElement.querySelectorAll('span');
-      for (let i = 0; i < spans.length; i++) {
-        if (typedText[i] === undefined) {
-          spans[i].classList.remove('correct', 'incorrect');
-        } else if (typedText[i] === spans[i].textContent) {
-          spans[i].classList.add('correct');
-          spans[i].classList.remove('incorrect');
-        } else {
-          spans[i].classList.add('incorrect');
-          spans[i].classList.remove('correct');
-        }
-      }
-
-      if (typedText === testText) {
-        endTime = new Date();
-        clearInterval(timerInterval);
-        calculateResults();
-        inputBox.disabled = true;
-        startButton.disabled = false;
-        endButton.disabled = true;
-        timerDisplay.textContent = 'Time: 00:00';
-      }
-    });
-
-    difficultySelect.addEventListener('change', () => {
-      setTestText(difficultySelect.value);
-    });
-
-    function calculateResults() {
-      const timeTaken = (endTime - startTime) / 1000; 
-      const words = testText.trim().split(/\s+/).length; 
-      const wpm = Math.round((words / timeTaken) * 60);
-      const accuracy = Math.round((typedText.length - getErrors(testText, typedText)) / testText.length * 100);
-      wpmDisplay.textContent = wpm;
-      accuracyDisplay.textContent = accuracy + '%';
+    function updateTimer() {
+      const currentTime = new Date();
+      const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+      const wpm = (typedText.length / 5) / (elapsedTime / 60);
+      wpmDisplay.textContent = Math.floor(wpm);
+      timerDisplay.textContent = `Time: ${elapsedTime}s`;
 
       if (wpm > bestWpm) {
-        bestWpm = wpm;
+        bestWpm = Math.floor(wpm);
         bestWpmDisplay.textContent = bestWpm;
         localStorage.setItem('bestWpm', bestWpm);
       }
+
+      const accuracy = (typedText.split('').filter((char, index) => char === testText[index]).length / testText.length) * 100;
       if (accuracy > bestAccuracy) {
-        bestAccuracy = accuracy;
-        bestAccuracyDisplay.textContent = bestAccuracy;
+        bestAccuracy = Math.floor(accuracy);
+        bestAccuracyDisplay.textContent = bestAccuracy + '%';
         localStorage.setItem('bestAccuracy', bestAccuracy);
       }
     }
 
-    function getErrors(correctText, typedText) {
-      let errors = 0;
-      for (let i = 0; i < Math.min(correctText.length, typedText.length); i++) {
-        if (correctText[i] !== typedText[i]) {
-          errors++;
-        }
-      }
-      return errors;
+    function calculateAccuracy() {
+      const correctChars = typedText.split('').filter((char, index) => char === testText[index]).length;
+      const accuracy = (correctChars / testText.length) * 100;
+      accuracyDisplay.textContent = Math.floor(accuracy) + '%';
     }
 
-    function updateTimer() {
-      const timeElapsed = new Date() - startTime;
-      const minutes = Math.floor(timeElapsed / 60000);
-      const seconds = Math.floor((timeElapsed % 60000) / 1000);
-      timerDisplay.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    inputBox.addEventListener('input', () => {
+      typedText = inputBox.value;
+      const testTextSpans = Array.from(testTextElement.children);
+      testTextSpans.forEach((span, index) => {
+        if (typedText[index] === span.textContent) {
+          span.className = 'correct';
+        } else if (typedText[index] !== undefined) {
+          span.className = 'incorrect';
+        } else {
+          span.className = '';
+        }
+      });
+      calculateAccuracy();
+
+      if (typedText.length >= testText.length) {
+        endTest();
+      }
+    });
+
+    startButton.addEventListener('click', () => {
+      setTestText(difficultySelect.value);
+      startTime = new Date();
+      if (timerEnabled) {
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+    });
+
+    endButton.addEventListener('click', endTest);
+
+    function endTest() {
+      if (timerEnabled) {
+        clearInterval(timerInterval);
+      }
     }
+
+    settingsButton.addEventListener('click', () => {
+      settingsContainer.style.display = settingsContainer.style.display === 'block' ? 'none' : 'block';
+    });
+
+    resetButton.addEventListener('click', () => {
+      localStorage.removeItem('bestWpm');
+      localStorage.removeItem('bestAccuracy');
+      bestWpm = 0;
+      bestAccuracy = 0;
+      bestWpmDisplay.textContent = bestWpm;
+      bestAccuracyDisplay.textContent = bestAccuracy + '%';
+    });
+
+    fontSelect.addEventListener('change', (event) => {
+      document.querySelector('.container').style.fontFamily = event.target.value;
+    });
+
+    textSizeSelect.addEventListener('change', (event) => {
+      document.querySelector('.test-text').style.fontSize = event.target.value;
+      document.querySelector('.input-box').style.fontSize = event.target.value;
+    });
+
+    colorFeedbackToggle.addEventListener('change', (event) => {
+      colorFeedbackEnabled = event.target.checked;
+      const testTextSpans = Array.from(testTextElement.children);
+      testTextSpans.forEach(span => {
+        if (colorFeedbackEnabled) {
+          span.className = typedText.includes(span.textContent) ? (typedText[span.textContent] === span.textContent ? 'correct' : 'incorrect') : '';
+        } else {
+          span.className = '';
+        }
+      });
+    });
+
+    timerToggle.addEventListener('change', (event) => {
+      timerEnabled = event.target.checked;
+      if (timerEnabled && startTime) {
+        timerInterval = setInterval(updateTimer, 1000);
+      } else {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = 'Time: 0s';
+      }
+    });
 
     setTestText('easy');
   </script>
