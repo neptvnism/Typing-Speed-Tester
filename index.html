@@ -45,11 +45,16 @@
     #difficulty-select {
       margin-top: 10px;
     }
+    #timer {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
   <div id="test-container">
     <h1>Typing Speed Test</h1>
+    <p id="timer">Time: 00:00</p>
     <p id="test-text">The quick brown fox jumps over the lazy dog.</p>
     <input type="text" id="input-box" disabled>
     <button id="start-button">Start</button>
@@ -57,6 +62,8 @@
     <div id="results">
       <p>WPM: <span id="wpm">0</span></p>
       <p>Accuracy: <span id="accuracy">0%</span></p>
+      <p>Best WPM: <span id="best-wpm">0</span></p>
+      <p>Best Accuracy: <span id="best-accuracy">0%</span></p>
     </div>
     <div id="difficulty-select">
       <label for="difficulty">Difficulty:</label>
@@ -76,10 +83,26 @@
     const wpmDisplay = document.getElementById('wpm');
     const accuracyDisplay = document.getElementById('accuracy');
     const difficultySelect = document.getElementById('difficulty');
+    const timerDisplay = document.getElementById('timer');
+    const bestWpmDisplay = document.getElementById('best-wpm');
+    const bestAccuracyDisplay = document.getElementById('best-accuracy');
 
     let startTime, endTime;
     let typedText = '';
     let testText = ''; // Store the actual test text
+    let timerInterval;
+    let bestWpm = 0;
+    let bestAccuracy = 0;
+
+    // Load best scores from local storage
+    if (localStorage.getItem('bestWpm')) {
+      bestWpm = parseInt(localStorage.getItem('bestWpm'));
+      bestWpmDisplay.textContent = bestWpm;
+    }
+    if (localStorage.getItem('bestAccuracy')) {
+      bestAccuracy = parseInt(localStorage.getItem('bestAccuracy'));
+      bestAccuracyDisplay.textContent = bestAccuracy;
+    }
 
     function setTestText(difficulty) {
       switch (difficulty) {
@@ -90,7 +113,7 @@
           testText = 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.';
           break;
         case 'hard':
-          testText = 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.';
+          testText = 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.';
           break;
       }
       testTextElement.textContent = testText;
@@ -102,24 +125,29 @@
       inputBox.focus();
       startButton.disabled = true;
       endButton.disabled = false;
+      timerInterval = setInterval(updateTimer, 1000);
     });
 
     endButton.addEventListener('click', () => {
       endTime = new Date();
+      clearInterval(timerInterval);
       calculateResults();
       inputBox.disabled = true;
       startButton.disabled = false;
       endButton.disabled = true;
+      timerDisplay.textContent = 'Time: 00:00';
     });
 
     inputBox.addEventListener('input', () => {
       typedText = inputBox.value;
       if (typedText === testText) {
         endTime = new Date();
+        clearInterval(timerInterval);
         calculateResults();
         inputBox.disabled = true;
         startButton.disabled = false;
         endButton.disabled = true;
+        timerDisplay.textContent = 'Time: 00:00';
       }
     });
 
@@ -134,6 +162,18 @@
       const accuracy = Math.round((typedText.length - getErrors(testText, typedText)) / testText.length * 100);
       wpmDisplay.textContent = wpm;
       accuracyDisplay.textContent = accuracy + '%';
+
+      // Update best scores
+      if (wpm > bestWpm) {
+        bestWpm = wpm;
+        bestWpmDisplay.textContent = bestWpm;
+        localStorage.setItem('bestWpm', bestWpm);
+      }
+      if (accuracy > bestAccuracy) {
+        bestAccuracy = accuracy;
+        bestAccuracyDisplay.textContent = bestAccuracy;
+        localStorage.setItem('bestAccuracy', bestAccuracy);
+      }
     }
 
     function getErrors(correctText, typedText) {
@@ -144,6 +184,13 @@
         }
       }
       return errors;
+    }
+
+    function updateTimer() {
+      const timeElapsed = new Date() - startTime;
+      const minutes = Math.floor(timeElapsed / 60000);
+      const seconds = Math.floor((timeElapsed % 60000) / 1000);
+      timerDisplay.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
     // Initial setup: Set easy difficulty by default
